@@ -1,0 +1,3 @@
+requests>=2.31,<3
+websockets>=12,<18
+rapidocr-onnxruntime>=1.2.3,<2

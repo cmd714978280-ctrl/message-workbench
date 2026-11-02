@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#182b27">
+  <title>群消息工作台</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="exports.css?v=20261028-miaoda-phash-v1">
+  <link rel="stylesheet" href="processing-core.css?v=20261102-readable-queue">
+  <link rel="stylesheet" href="styles-refresh.css?v=20261102-message-first">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div><strong>群消息工作台</strong><small>群消息整理与处理</small></div>
+      </div>
+
+      <div class="side-caption">日常处理</div>
+      <nav class="primary-nav" aria-label="主导航">
+        <button class="nav-item" data-view="processing"><span class="nav-icon">▣</span><span>信息处理</span></button>
+        <button class="nav-item active" data-view="inbox"><span class="nav-icon">◫</span><span>消息明细</span><span class="nav-count" id="nav-pending">—</span></button>
+        <button class="nav-item" data-view="exports"><span class="nav-icon">↥</span><span>飞书入库</span></button>
+        <button class="nav-item" data-view="replies"><span class="nav-icon">↩</span><span>已发消息</span></button>
+        <div class="nav-section-label">规则与资料</div>
+        <button class="nav-item" data-view="business-data"><span class="nav-icon">▦</span><span>业务资料</span></button>
+        <button class="nav-item" data-view="rules"><span class="nav-icon">⚙</span><span>处理规则</span></button>
+        <button class="nav-item" data-view="faq"><span class="nav-icon">▤</span><span>FAQ 管理</span></button>
+        <button class="nav-item" data-view="faq-candidates"><span class="nav-icon">✚</span><span>FAQ 沉淀</span></button>
+        <button class="nav-item" data-view="copy"><span class="nav-icon">✦</span><span>售后话术</span></button>
+        <div class="nav-section-label">开发校准</div>
+        <button class="nav-item" data-view="dev-audit"><span class="nav-icon">⌕</span><span>分类审核</span></button>
+        <button class="nav-item" data-view="suggestion-audit"><span class="nav-icon">✓</span><span>对话分拣校准</span></button>
+        <div class="nav-section-label">连接与记录</div>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⌘</span><span>连接设置</span></button>
+        <button class="nav-item" data-view="history"><span class="nav-icon">◷</span><span>处理记录</span></button>
+      </nav>
+
+      <div class="side-rule"></div>
+      <div class="rule-switcher">
+        <div class="side-caption">当前规则</div>
+        <button class="rule-card" type="button"><span class="rule-dot"></span><span class="rule-label"><strong>聚合群消息</strong><small>规则 ID · 读取配置中</small></span><span class="chevron">⌄</span></button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-chip"><div class="avatar">中</div><div class="user-info"><strong>本机工作区</strong><small>本地服务 · 确认后入库</small></div><span class="more">···</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>运营工作台</span><span class="crumb-sep">/</span><strong id="breadcrumb-current">审核队列</strong></div>
+        <div class="top-actions">
+          <div class="mode-pill"><span class="mode-icon">⏸</span>群回复人工审核 · 飞书确认入库</div>
+          <button class="icon-button" aria-label="帮助" title="帮助">?</button>
+        </div>
+      </header>
+
+      <section class="view active" id="view-inbox">
+        <div class="page-intro">
+          <div>
+            <div class="eyebrow">LIVE MESSAGE REVIEW <span class="eyebrow-line"></span> <span id="live-rule-label">RULE ID · 配置加载中</span></div>
+            <h1>消息审核队列</h1>
+            <p class="subhead">按客户会话审核消息，查看判断依据并决定下一步处理。</p>
+          </div>
+          <div class="intro-right"><span class="sync-label"><span class="status-dot amber"></span>正在连接本机服务</span><button id="toggle-sync" class="button button-secondary" type="button">暂停同步</button><button id="refresh-demo" class="button button-secondary"><span class="refresh-icon">↻</span><span id="refresh-label">立即同步</span></button></div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card metric-main"><div class="metric-top"><span>今日已保存</span><span class="metric-icon icon-spark">✦</span></div><div class="metric-number" id="metric-total">—</div><div class="metric-foot"><span class="metric-muted">图片已归档</span><span class="metric-inline-value" id="metric-classified">—</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span>全库待审核</span><span class="metric-icon icon-review">◫</span></div><div class="metric-number" id="metric-pending">—</div><div class="metric-foot"><span class="metric-muted">按已保存消息计算</span><span class="mini-tag">待处理</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span>需要关注</span><span class="metric-icon icon-alert">!</span></div><div class="metric-number" id="metric-attention">—</div><div class="metric-foot"><span class="metric-muted">广告 / 售后 / 刷屏</span><span class="mini-tag soft-amber">待人工审核</span></div></article>
+        </div>
+
+        <div class="inbox-layout">
+          <section class="panel queue-panel">
+            <div class="panel-heading queue-heading">
+              <div><h2>待处理消息</h2><span class="panel-caption">按优先级和时间排序</span></div>
+              <label class="conversation-group-toggle"><input id="group-conversations" type="checkbox" checked><span>按客户会话聚合</span></label>
+            </div>
+            <div class="queue-controls">
+              <label class="search-box"><span class="search-icon">⌕</span><input id="message-search" type="search" placeholder="搜索消息、群或成员"></label>
+              <button class="filter-button" id="filter-button" type="button" aria-expanded="false" aria-controls="queue-advanced-filters"><span>☷</span>更多筛选<span class="filter-active-count" id="filter-active-count" hidden></span><span class="filter-chevron" aria-hidden="true">⌄</span></button>
+            </div>
+            <div class="filter-tabs" id="filter-tabs">
+              <button class="filter-tab selected" data-filter="all">全部 <span id="filter-all-count">—</span></button>
+              <button class="filter-tab" data-filter="urgent">优先 <span id="filter-urgent-count">0</span></button>
+              <button class="filter-tab" data-filter="conflict">判断分歧 <span id="filter-conflict-count">0</span></button>
+            </div>
+            <div class="queue-advanced-filters" id="queue-advanced-filters" hidden>
+              <label class="filter-field"><span>消息类型</span><select id="filter-kind" aria-label="消息类型"><option value="">全部类型</option><option value="feedback">反馈图候选</option><option value="order_image">订单截图</option><option value="requirement">产品需求</option><option value="product_link">当天商品链接</option><option value="thanks">强提醒感谢</option><option value="qa">日常问题</option><option value="service">售后问题</option><option value="warning">疑似推广</option><option value="mini">小程序</option><option value="burst">疑似刷屏</option><option value="closing">无需回复</option><option value="ordinary">普通交流</option><option value="unknown">待判断</option></select></label>
+              <label class="filter-field"><span>群名称</span><input id="filter-group" type="text" placeholder="输入群名称"></label>
+              <label class="filter-field"><span>开始日期</span><input id="filter-start" type="date" aria-label="开始日期"></label>
+              <label class="filter-field"><span>结束日期</span><input id="filter-end" type="date" aria-label="结束日期"></label>
+              <label class="filter-field"><span>分类复核状态</span><select id="filter-status" aria-label="分类复核状态"><option value="">全部状态</option><option value="pending">分类待审核</option><option value="approved">分类已确认</option><option value="rejected">分类待判断</option></select></label>
+              <label class="filter-field"><span>处理状态</span><select id="filter-work-status" aria-label="处理状态"><option value="">全部状态</option><option value="pending">处理待审核</option><option value="approved">草稿已批准</option><option value="handled">已处理</option><option value="needs_human">转人工</option><option value="rejected">已驳回</option></select></label>
+              <div class="filter-actions"><button id="clear-filters" type="button" class="filter-clear">清空</button><button id="apply-filters" type="button" class="filter-apply">应用筛选</button></div>
+            </div>
+            <div class="queue-list" id="message-list" aria-live="polite"></div>
+            <div class="queue-footer"><span><i class="tiny-live"></i><span id="last-sync-text">等待连接</span></span><button id="load-more" class="text-button">查看较早消息 <span>→</span></button></div>
+          </section>
+
+          <section class="panel detail-panel" id="detail-panel">
+            <div id="message-detail"></div>
+          </section>
+        </div>
+        <div class="privacy-banner"><span class="privacy-banner-icon">ⓘ</span><div><strong>只读接入说明</strong><span>消息保存在本机数据库；审核结论仅记录在本机，不会触发群消息发送或飞书上传。来源历史的覆盖情况请查看连接设置。</span></div><button class="banner-close" aria-label="关闭提示">×</button></div>
+      </section>
+
+      <section class="view" id="view-replies">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">SENT MESSAGE HISTORY <span class="eyebrow-line"></span> READ ONLY</div><h1>云中客已发消息</h1><p class="subhead">查看云中客历史接口返回的发送记录；这些消息不进入审核队列，也不会由工作台再次发送。</p></div><div class="intro-right"><button class="button button-secondary" id="refresh-replies" type="button">刷新本机记录</button></div></div>
+        <div class="source-banner"><div class="source-mark">↩</div><div class="source-copy"><strong id="reply-count">正在读取已发消息</strong><span>历史记录中的发送成功状态来自云中客；是否与某条收到的消息直接对应，尚未核实。</span></div></div>
+        <div class="inbox-layout">
+          <section class="panel queue-panel"><div class="panel-heading queue-heading"><div><h2>已发记录</h2><span class="panel-caption">按本机入库顺序，最近保存的在前</span></div></div><div class="queue-list" id="reply-list" aria-live="polite"></div><div class="queue-footer"><span>只读历史</span><button id="load-more-replies" class="text-button" type="button">继续加载 <span>→</span></button></div></section>
+          <section class="panel detail-panel" id="reply-detail"></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-faq">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">KNOWLEDGE BASE <span class="eyebrow-line"></span> LOCAL EDITS</div><h1>FAQ 管理</h1><p class="subhead">云中客快捷回复作为只读来源；导入项经审核启用后才能用于答疑，修改不写回云中客。</p></div><div class="intro-right"><button class="button button-secondary" id="faq-refresh">来源状态</button><button class="button button-secondary" id="faq-import-open">导入来源快照</button><button class="button button-primary" id="faq-add">＋ 新建 FAQ</button></div></div>
+        <div class="source-banner"><div class="source-mark">云</div><div class="source-copy"><strong>云中客快捷回复</strong><span id="faq-source-summary">正在读取来源快照状态</span></div><span class="source-status" id="faq-source-state"><i class="status-dot amber"></i>待核对</span><button class="text-button" id="faq-sync-info">同步规则 <span>↗</span></button></div>
+        <div class="faq-layout">
+          <aside class="panel faq-groups"><div class="panel-heading"><div><h2>知识分组</h2><span class="panel-caption">5 个来源分组</span></div><button class="quiet-icon" title="新增分组">＋</button></div><div class="group-list" id="faq-groups-list"></div><div class="group-foot"><span class="tiny-lock">⌑</span>来源更新不会覆盖本地修改</div></aside>
+          <section class="panel faq-content"><div class="faq-toolbar"><div><h2 id="faq-group-title">所有 FAQ</h2><span class="panel-caption" id="faq-group-subtitle">已启用内容可用于答疑建议</span></div><label class="search-box faq-search"><span class="search-icon">⌕</span><input id="faq-search" type="search" placeholder="搜索问题或答案"></label></div><div class="faq-table-wrap"><table class="faq-table"><thead><tr><th>问题 / 关键词</th><th>建议答案</th><th>来源</th><th>状态</th><th></th></tr></thead><tbody id="faq-table-body"></tbody></table></div><div class="table-foot"><span id="faq-count-label">显示 0 条</span><span>仅保存在本机，不写回云中客</span></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-faq-candidates">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">真实回复沉淀 <span class="eyebrow-line"></span> 本机候选</div><h1>FAQ 沉淀</h1><p class="subhead">从明确关联的人工回复整理可复用问答。候选需确认后才加入当前可用 FAQ；当前产品内容可先标待补充，加入可用库前需填写失效日期。</p></div><div class="intro-right"><span class="dev-only-tag">本机保存 · 不发送消息</span></div></div>
+        <div class="dev-audit-notice suggestion-purpose-notice"><strong>候选整理规则</strong><p>真实回复会作为答案来源；同一范围、商品和标准答案的重复案例会合并并累计问法与来源。商品名无法确认的会暂标“商品尚未识别”，不会当作通用 FAQ；补全商品名与有效期后才可启用。通用 FAQ 不受商品日期限制。确认加入后只更新本机 FAQ，不写回云中客或飞书。</p></div>
+        <section class="panel faq-candidate-panel"><div class="panel-heading queue-heading"><div><h2>真实回复候选</h2><span class="panel-caption" id="faq-candidate-count">正在读取</span></div><button class="button button-secondary" id="refresh-faq-candidates" type="button">刷新候选</button></div>
+          <div class="dev-audit-status-tabs faq-candidate-tabs"><button type="button" data-faq-candidate-status="pending" aria-pressed="true">待确认</button><button type="button" data-faq-candidate-status="approved" aria-pressed="false">已加入 FAQ</button><button type="button" data-faq-candidate-status="rejected" aria-pressed="false">暂不采用</button><button type="button" data-faq-candidate-status="all" aria-pressed="false">全部</button></div>
+          <div class="dev-audit-status-tabs faq-candidate-tabs"><button type="button" data-faq-candidate-scope="all" aria-pressed="true">全部范围</button><button type="button" data-faq-candidate-scope="product" aria-pressed="false">当前产品</button><button type="button" data-faq-candidate-scope="general" aria-pressed="false">通用</button></div>
+          <div class="workflow-record-list faq-candidate-list" id="faq-candidate-list"><div class="work-item-load-state">正在读取候选…</div></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-rules">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">MESSAGE CLASSIFICATION <span class="eyebrow-line"></span> SHADOW MODE</div><h1>处理规则</h1><p class="subhead">调整初步分类条件后会生成新版本并重算已保存消息；人工改判保留。</p></div><div class="intro-right"><span class="mode-pill"><span class="mode-icon">⏸</span>人工审核</span></div></div>
+        <div class="rules-grid">
+          <section class="panel rules-panel">
+            <div class="panel-heading"><div><h2>消息初步分类</h2><span class="panel-caption">来源消息入库后生成可复核的类别和依据</span></div><span class="editable-tag">可配置</span></div>
+            <label class="rule-setting-row"><span class="rule-setting-icon feedback-rule-icon">▧</span><span class="rule-setting-copy"><strong>用户反馈图</strong><small>识别带图片的真实使用反馈，加入图库候选审核</small></span><input class="switch-input" id="rule-feedback" type="checkbox"><span class="switch-track"></span></label>
+            <label class="rule-setting-row"><span class="rule-setting-icon warning-rule-icon">!</span><span class="rule-setting-copy"><strong>广告、无关内容和小程序</strong><small>命中后提示群规，并交由人工核验身份和白名单</small></span><input class="switch-input" id="rule-warning" type="checkbox"><span class="switch-track"></span></label>
+            <label class="rule-setting-row"><span class="rule-setting-icon service-rule-icon">↗</span><span class="rule-setting-copy"><strong>售后消息</strong><small>识别售后诉求；回复文案属于后续处理阶段</small></span><input class="switch-input" id="rule-aftercare" type="checkbox"><span class="switch-track"></span></label>
+            <label class="rule-setting-row"><span class="rule-setting-icon qa-rule-icon">?</span><span class="rule-setting-copy"><strong>日常问题</strong><small>识别提问；有无可靠 FAQ 答案另行判断</small></span><input class="switch-input" id="rule-qa" type="checkbox"><span class="switch-track"></span></label>
+            <label class="rule-setting-row"><span class="rule-setting-icon closing-rule-icon">✓</span><span class="rule-setting-copy"><strong>简短确认与礼貌收尾</strong><small>“好、行、嗯、收到”等没有新问题的消息标记为无需回复</small></span><input class="switch-input" id="rule-closing" type="checkbox"><span class="switch-track"></span></label>
+            <div class="rule-range-setting"><div class="range-heading"><strong>FAQ 匹配参数（后续阶段使用）</strong><output id="qa-confidence-output">82%</output></div><input id="qa-confidence" type="range" min="50" max="99" step="1" aria-label="FAQ 匹配参数"><small>此参数暂不参与第二部分的初步分类，也不代表真实置信度。</small></div>
+          </section>
+          <section class="panel rules-panel">
+            <div class="panel-heading"><div><h2>炸群与刷屏提醒</h2><span class="panel-caption">按同一成员的连续消息数量判断</span></div><label class="compact-switch"><input class="switch-input" id="rule-burst" type="checkbox"><span class="switch-track"></span></label></div>
+            <div class="burst-fields"><label class="field"><span>消息数量阈值</span><div class="number-with-unit"><input id="burst-count" type="number" min="3" max="100"><span>条及以上</span></div></label><label class="field"><span>统计时间窗口</span><div class="number-with-unit"><input id="burst-seconds" type="number" min="5" max="600"><span>秒内</span></div></label></div>
+            <div class="allowlist-section"><label class="field"><span>同一客户上下文窗口</span><div class="number-with-unit"><input id="conversation-minutes" type="number" min="1" max="30"><span>分钟</span></div><small>用于把同群同一客户连续发的文字、图片和跟进问题放在一起判断。</small></label></div>
+            <div class="rule-example"><span class="example-icon">≋</span><span>示例：同一成员在 <b id="burst-example-seconds">30</b> 秒内发送 <b id="burst-example-count">8</b> 条及以上，生成“疑似刷屏”提醒。</span></div>
+            <div class="allowlist-section"><label class="field"><span>白名单群或成员</span><textarea id="rule-allowlist" rows="5" placeholder="每行填写一个群 ID、群名称或成员标识"></textarea><small>白名单只用于降低误报；命中内容仍会显示在队列供人工查看。</small></label></div>
+          </section>
+          <section class="panel rules-footer-panel"><div><strong>处理顺序</strong><p>结构化消息、识别上下文、生成多标签和待判断原因。规则变化不会覆盖人工结论。</p></div><button class="button button-primary" id="save-rules">保存并重算</button></section>
+          <section class="panel rules-footer-panel"><div><strong>规则版本</strong><p id="rule-version-list">正在读取版本…</p></div><button class="button button-secondary" id="reprocess-analysis" type="button">重新分析当前版本</button></section>
+          <section class="panel rules-footer-panel"><div><strong>分类质量</strong><p id="evaluation-report">等待人工标注样本；暂无可验证的准确率。</p></div><button class="button button-secondary" id="refresh-evaluation" type="button">刷新统计</button></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-copy">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">RESPONSE SETTINGS <span class="eyebrow-line"></span> EDITABLE</div><h1>售后话术</h1><p class="subhead">链接和文案都可以在这里更新；审核时会展示当下的完整建议。</p></div><div class="intro-right"><span class="saved-indicator" id="copy-save-status">● 本机配置</span></div></div>
+        <div class="settings-grid">
+          <section class="panel settings-card wide-card"><div class="settings-title"><div class="settings-icon icon-link">↗</div><div><h2>售后客服入口</h2><p>售后客服兼任一对一客服，承接产品需求、复购咨询和售后问题。</p></div><span class="editable-tag">可编辑</span></div><div class="form-grid"><label class="field full-field"><span>售后链接名称</span><input id="aftercare-name" type="text" placeholder="例如：售后客服"></label><label class="field full-field"><span>当前售后链接</span><div class="input-with-icon"><span>↗</span><input id="aftercare-url" type="url" placeholder="https://…"></div><small>留空时建议内容保留【售后链接】占位符。</small></label><label class="field full-field"><span>普通售后话术</span><textarea id="aftercare-template" rows="3" placeholder="请联系售后客服处理：{{售后链接}}"></textarea><small>使用 <code>{{售后链接}}</code> 插入当前链接。</small></label><label class="field full-field"><span>产品需求/一对一客服话术</span><textarea id="customer-service-template" rows="3" placeholder="需要一对一协助，可联系售后客服：{{售后链接}}"></textarea></label><label class="field full-field"><span>之前活动商品链接话术</span><textarea id="previous-activity-template" rows="3" placeholder="请联系售后客服咨询之前活动的商品链接：{{售后链接}}"></textarea></label></div><div class="settings-actions"><button class="button button-primary" id="save-aftercare">保存售后配置</button><button class="button button-quiet" id="preview-aftercare">预览回复</button></div><div class="preview-box hidden" id="aftercare-preview"></div></section>
+          <section class="panel settings-card"><div class="settings-title"><div class="settings-icon icon-shield">✓</div><div><h2>编辑记录</h2><p>便于确认链接切换时间和文案版本。</p></div></div><div class="history-empty" id="aftercare-history"><div class="empty-symbol">◷</div><strong>暂无修改记录</strong><span>保存后会显示本机配置的变更时间。</span></div></section>
+        </div>
+        <section class="panel settings-card"><label class="field"><span><input id="faq-service-contacts" type="checkbox"> 缺少群客服映射时，从已审核启用的 FAQ 读取客服入口</span><small>按账号、群和日期筛选 FAQ，并区分普通客服、回购及下单协助；同一用途出现不同链接时转人工。优先使用单独配置的本群客服链接；修改或停用 FAQ 后建议同步更新。</small></label><label class="field"><span><input id="aftercare-global-scope" type="checkbox"> 我确认上述链接可用于所有未单独配置客服的群（旧版全局兼容）</span><small>默认使用“业务资料 → 群与客服配置”的群级链接；只有勾选后，全局链接才会作为缺少群映射时的兼容项。</small></label></section>
+      </section>
+
+      <section class="view" id="view-settings">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">INTEGRATIONS <span class="eyebrow-line"></span> LOCAL CONFIG</div><h1>连接设置</h1><p class="subhead">云中客消息由本机服务连接；飞书图库可核验读取权限，本阶段尚未开放上传。</p></div><div class="intro-right"><span class="mode-pill"><span class="mode-icon">⏸</span>只读影子模式</span></div></div>
+        <div class="integration-grid">
+          <section class="panel integration-card"><div class="integration-head"><div class="integration-logo feishu-logo">飞</div><div><h2>飞书反馈图库</h2><p>图库地址和应用凭证由本机保存；可测试目标表格读取权限。</p></div><span class="connection-state" id="feishu-state"><i class="status-dot amber"></i>待测试</span></div><div class="form-grid"><label class="field full-field"><span>图库类型</span><select id="gallery-type"><option value="bitable">飞书多维表格</option><option value="drive">飞书云盘文件夹</option><option value="doc">飞书文档</option></select></label><label class="field full-field"><span>图库地址</span><input id="gallery-url" type="url" placeholder="粘贴多维表格、文件夹或文档链接"><small>当前提供多维表格只读连接测试。</small></label><div class="field"><span>应用 ID</span><input id="feishu-app-id" type="text" placeholder="cli_…"></div><div class="field"><span>应用凭证</span><input id="feishu-app-secret" type="password" placeholder="留空则沿用现有凭证" autocomplete="new-password"><small>只发送到本机服务，不返回到页面。</small></div></div><div class="integration-actions"><button class="button button-primary" id="save-gallery">保存配置</button><button class="button button-secondary" id="test-gallery">测试只读连接</button></div><div class="security-note"><span>⌑</span><span>连接测试只读取字段；实际上传与新增记录在“飞书入库”中单独执行。</span></div></section>
+          <section class="panel integration-card cms-card"><div class="integration-head"><div class="integration-logo cms-logo">云</div><div><h2>云中客消息来源</h2><p>当前配置规则的只读群消息连接。</p></div><span class="connection-state"><i class="status-dot amber"></i>正在连接</span></div><div class="source-detail"><div><span>消息页面</span><strong>cms.iyunzk.com/im/</strong></div><div><span>规则 ID</span><strong id="cms-rule-id">读取配置中</strong></div><div><span>关联机器人</span><strong>等待读取</strong></div><div><span>实时消息流</span><strong>连接中</strong></div><div><span>本机存储</span><strong id="source-store-status">等待读取</strong></div><div><span>历史覆盖</span><strong id="source-coverage-status">待核验</strong></div></div><div class="history-range"><strong>按日期补读历史</strong><div><label>开始日期 <input id="history-start-date" type="date"></label><label>结束日期 <input id="history-end-date" type="date"></label><button class="button button-secondary" id="read-range-history" type="button">读取并核对</button></div><small>补读只在同步暂停时执行；每次最多 31 天，读取结果会记录页数和异常。</small></div><div class="security-note"><span>ⓘ</span><span>账号凭证从工作区根目录 .env 读取，不展示在页面。服务只接收消息；审核结论不会发送到云中客。</span></div></section>
+          <section class="panel integration-card workflow-config-card"><div class="integration-head"><div class="integration-logo feishu-logo">表</div><div><h2>业务流转目标与当日商品</h2><p>用于生成需求、订单图和当天商品待办；地址与文案可随时修改。</p></div></div><div class="form-grid"><label class="field"><span>产品需求表地址</span><input id="demand-table-url" type="url" placeholder="后续粘贴飞书表格链接"></label><label class="field"><span>订单图表地址</span><input id="order-table-url" type="url" placeholder="后续粘贴飞书表格链接"></label><label class="field full-field"><span>售后证据表地址</span><input id="aftercare-evidence-url" type="url" placeholder="飞书售后证据表链接"></label><label class="field full-field"><span>当天商品带链接文案</span><textarea id="today-product-copy" rows="3" placeholder="每天更新；粘贴当天群内商品和购买链接文案"></textarea></label><label class="field"><span>上周售卖商品（每行一个）</span><textarea id="sold-last-week-products" rows="3" placeholder="商品名称"></textarea></label><label class="field"><span>未来一周计划售卖商品（每行一个）</span><textarea id="sold-next-week-products" rows="3" placeholder="商品名称"></textarea></label><label class="field"><span>@豆妈感谢回复话术</span><input id="thanks-template" type="text" placeholder="谢谢支持～"></label><label class="field full-field"><span><input id="image-understanding-enabled" type="checkbox" checked> 对规则拿不准的图片使用 DeepSeek 视觉初筛</span><small>读取本机归档图片和相邻配文，结果供人工审核；成功结果按图片内容缓存，避免重复识别。</small></label><label class="field"><span>允许分享的群内链接域名</span><input id="allowed-share-domains" type="text" placeholder="每行一个域名；留空时外链进入撤回核验"></label></div><div class="integration-actions"><button class="button button-primary" id="save-workflow-config">保存业务配置</button></div><div class="security-note"><span>ⓘ</span><span>需求表和订单图表目前只作为待办目标，尚未开放飞书写入。当天商品文案只进入待审草稿。</span></div><div class="security-note"><span>⌕</span><span>图片文字初筛：<strong id="ocr-state">等待本机识别</strong>。OCR 只在本机运行，结果只作人工审核依据。</span></div><div class="security-note"><span>◈</span><span>图片视觉初筛：<strong id="vision-state">等待图片视觉初筛</strong></span></div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-history">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">AUDIT TRAIL <span class="eyebrow-line"></span> LOCAL DATABASE</div><h1>处理记录</h1><p class="subhead">人工分类结论保存在本机数据库，便于追踪和校正。</p></div><div class="intro-right"><button class="button button-secondary" id="clear-history">刷新记录</button></div></div>
+        <section class="panel history-panel"><div class="panel-heading"><div><h2>审核操作</h2><span class="panel-caption">服务端持久保存</span></div><span class="audit-count" id="audit-count">0 条记录</span></div><div id="audit-list" class="audit-list"></div></section>
+      </section>
+
+      <section class="view" id="view-processing">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">按客户对话处理</div><h1>信息处理</h1><p class="subhead">按消息日期确定当天商品，再结合上下文和有效 FAQ 给出建议。真实回复用于校准，图片、需求和客服跟进各自保留任务。</p><small id="core-runtime">正在读取运行状态…</small></div><div class="intro-right"><button class="button button-secondary" id="core-refresh">刷新列表</button></div></div>
+        <div id="core-notice" class="workflow-note" role="status" hidden></div>
+        <div id="core-summary" class="core-summary"><span>正在读取处理统计…</span></div>
+        <details id="core-readiness" class="core-readiness"><summary>正在检查业务资料…</summary></details>
+        <div class="core-review-entry"><button class="button button-secondary" id="core-conflicts" type="button">规则冲突待复核 · 正在统计</button><span>规则冲突为 0 不代表分类全部正确；可在待语义复核中查看其他不确定案例。</span></div>
+        <div class="core-layout"><section class="panel queue-panel"><div class="panel-heading"><div><h2>客户对话</h2><span id="core-count" class="panel-caption">正在读取…</span></div></div><div class="core-filters"><select id="core-filter" aria-label="处理状态"><option value="todo">待处理</option><option value="semantic_review">待语义复核</option><option value="machine_evidence">含真人回复自动核对的分类</option><option value="classification_conflict">规则冲突待复核</option><option value="needs_configuration">待补资料</option><option value="human">待人工处理</option><option value="ready">建议待确认</option><option value="answered">已有真实回复</option><option value="no_reply">无需回复</option><option value="confirmed">已确认建议</option><option value="waiting">等待资料</option><option value="handled">已人工处理</option><option value="stale">建议已更新</option><option value="all">全部</option></select><input id="core-search" type="search" placeholder="搜索群、客户或消息内容" aria-label="搜索客户对话"></div><div id="core-list" class="queue-list"><div class="work-item-load-state">正在读取对话…</div></div><div class="queue-footer"><button class="text-button" id="core-more" hidden>继续加载</button></div></section><section class="panel detail-panel" id="core-detail"><div class="detail-placeholder"><div><strong>选择一段客户对话</strong><span>查看处理建议、真实回复和关联图片。</span></div></div></section></div>
+      </section>
+
+      <section class="view" id="view-exports">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">已确认任务执行</div><h1>飞书入库</h1><p class="subhead">将已确认的反馈图及配文、订单图和产品需求登记到飞书。图库“哈希指纹”按妙搭画布算法计算 pHash；SHA-256 仍用于本地文件校验和来源去重。</p></div><button class="button button-secondary" id="export-refresh">刷新记录</button></div>
+        <div class="export-toolbar"><button class="button button-secondary" id="export-prepare">收集已确认任务</button><button class="button button-primary" id="export-run">执行待入库任务（最多5项）</button><button class="button button-secondary" id="export-retry">重试失败或待核对任务</button></div>
+        <p class="panel-caption">“收集已确认任务”会在当前浏览器用与妙搭相同的画布算法计算反馈图指纹。历史已入库记录只显示待回补数量，不会自动改写。</p>
+        <p id="export-notice" role="status">进入页面仅查看记录。执行入库会实际上传图片并写入已配置的飞书表。</p><div id="export-summary" class="export-summary">正在读取入库状态…</div><div id="export-list"></div>
+      </section>
+
+      <section class="view" id="view-business-data">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">业务资料 <span class="eyebrow-line"></span> 只读资料源</div><h1>业务资料与群配置</h1><p class="subhead">管理群客服映射、飞书只读资料、排品候选和人工维护的商品链接。周期同步默认关闭，开启后仅读取飞书资料，不影响云中客消息同步。</p></div><div class="intro-right"><button class="button button-secondary" id="workflow-refresh" type="button">刷新状态</button></div></div>
+        <section class="panel workflow-status-panel"><div class="panel-heading"><div><h2>资料源状态</h2><span class="panel-caption">凭证仅由本机服务读取；每个资料源独立设置账号、只读周期与停用开关</span></div><span class="dev-only-tag" id="workflow-schema-state">加载中</span></div><div class="workflow-source-list" id="workflow-source-list"><div class="work-item-load-state">正在读取资料源状态…</div></div></section>
+        <div class="integration-grid workflow-grid">
+          <section class="panel integration-card"><div class="integration-head"><div class="integration-logo feishu-logo">群</div><div><h2>群与售后客服配置</h2><p>本群客服配置优先；未配置时可按设置从启用 FAQ 读取用途一致、范围有效且唯一的客服入口。</p></div></div><div class="form-grid"><label class="field"><span>编辑已有客服配置</span><select id="service-existing"><option value="">新建客服配置</option></select></label><label class="field"><span>客服配置名称</span><input id="service-name" maxlength="120" placeholder="例如：一群售后"></label><label class="field"><span>客服链接</span><input id="service-url" type="url" placeholder="https://…（留空表示待补）"></label><label class="field full-field"><span>转接话术</span><textarea id="service-template" rows="2">需要一对一协助，可联系售后客服：{{售后链接}}</textarea></label><button class="button button-secondary" id="save-service-profile" type="button">保存客服配置</button></div><div class="workflow-divider"></div><div class="form-grid"><label class="field"><span>来源账号</span><select id="group-account"><option value="">云中客来源账号加载中</option></select></label><label class="field"><span>群 ID</span><input id="group-id" list="observed-groups" maxlength="160" placeholder="从已有群中选择或粘贴 ID"><datalist id="observed-groups"></datalist></label><label class="field"><span>群显示名</span><input id="group-name" maxlength="200" placeholder="群名称"></label><label class="field"><span>客服配置</span><select id="group-profile"><option value="">暂不指定</option></select></label><button class="button button-primary" id="save-business-group" type="button">保存群映射</button></div><div class="workflow-record-list" id="business-groups-list"></div></section>
+          <section class="panel integration-card"><div class="integration-head"><div class="integration-logo feishu-logo">品</div><div><h2>商品与购买链接</h2><p>手工维护的链接按商品、日期和群范围管理，确认后只进入建议草稿。</p></div></div><div class="form-grid"><label class="field"><span>商品目录绑定（可选）</span><select id="product-link-product"><option value="">手动录入商品名</option></select></label><label class="field"><span>商品名称</span><input id="product-link-name" maxlength="200" placeholder="商品名称"></label><label class="field"><span>业务日期</span><input id="product-link-date" type="date"></label><label class="field full-field"><span>购买链接（HTTPS）</span><input id="product-link-url" type="url" placeholder="https://…"></label><label class="field full-field"><span>群内文案</span><textarea id="product-link-copy" rows="3" placeholder="可选；不填不会生成商品回复"></textarea></label><label class="field full-field"><span>适用群 ID（逗号分隔，需先建立群映射）</span><input id="product-link-groups" placeholder="group-id-1, group-id-2"></label><label class="field"><span>资料状态</span><select id="product-link-state"><option value="draft">草稿</option><option value="confirmed">确认用于当日建议</option></select></label><button class="button button-primary" id="save-product-link" type="button">保存商品链接</button></div><div class="workflow-record-list" id="product-links-list"></div></section>
+        </div>
+        <section class="panel workflow-status-panel"><div class="panel-heading"><div><h2>商品目录</h2><span class="panel-caption">仅维护商品名称和确认别名；目录本身不表示排期或实际在售</span></div></div><div class="form-grid"><label class="field"><span>编辑已有商品</span><select id="product-catalog-existing"><option value="">新建商品</option></select></label><label class="field"><span>商品名称</span><input id="product-catalog-name" maxlength="200" placeholder="正式商品名"></label><label class="field full-field"><span>别名（逗号分隔，人工确认）</span><input id="product-catalog-aliases" maxlength="3000" placeholder="常见简称、客户口语名称"></label><label class="field"><span>目录状态</span><select id="product-catalog-state"><option value="draft">草稿</option><option value="active">启用</option><option value="inactive">停用</option></select></label><button class="button button-primary" id="save-product-catalog" type="button">保存商品目录</button></div><div class="workflow-record-list" id="product-catalog-list"></div></section>
+        <section class="panel workflow-status-panel"><div class="panel-heading"><div><h2>飞书资料读取与排品预览</h2><span class="panel-caption">按消息发生日期匹配月历与当天子表；仅作商品和文案核对，不代表实际售卖或自动发送</span></div></div><div class="workflow-note" id="workflow-operation-result">尚未执行本轮只读读取。</div><div class="workflow-schedule-confirm"><label class="field"><span>确认排品表年份</span><input id="schedule-year" type="number" min="2000" max="2100" placeholder="必须人工确认"></label><label class="field"><span>适用群 ID（逗号分隔，* 表示全部群）</span><input id="schedule-groups" placeholder="需先建立群映射"></label><button class="button button-secondary" id="confirm-schedule" type="button">确认排期范围（不代表已售）</button></div><div class="workflow-record-list" id="schedule-candidates-list"></div></section>
+        <div class="integration-grid workflow-grid">
+          <section class="panel integration-card"><div class="integration-head"><div class="integration-logo feishu-logo">文</div><div><h2>文案手动导入兜底</h2><p>文案按消息日期查找排品计划下的日期子表；找不到或需要补充时，可手动导入候选，确认后生效。</p></div></div><label class="field"><span>资料内容（JSON 数组或 CSV）</span><textarea id="manual-material-content" rows="7" placeholder='[{"title":"标题","body":"文案","business_date":"YYYY-MM-DD","group_scope":["群ID"],"links":[]} ]'></textarea></label><div class="integration-actions"><select id="manual-material-format"><option value="json">JSON</option><option value="csv">CSV</option></select><select id="manual-material-type"><option value="daily_copy">每日文案</option><option value="daily_faq">每日 FAQ</option></select><select id="manual-material-source"><option value="feishu-copy-test">测试文案源</option><option value="feishu-product-schedule">排品计划源</option></select><button class="button button-primary" id="import-manual-material" type="button">导入为待确认草稿</button></div><div class="workflow-record-list" id="manual-material-list"></div></section>
+          <section class="panel integration-card"><div class="integration-head"><div class="integration-logo feishu-logo">账</div><div><h2>扩展来源账号</h2><p>这里只登记账号、规则和机器人映射；没有新凭证时不会启动连接。</p></div></div><div class="form-grid"><label class="field"><span>账号标识</span><input id="account-id" maxlength="160" placeholder="例如 yunzhongke:account-2"></label><label class="field"><span>显示名</span><input id="account-name" maxlength="160" placeholder="来源账号名称"></label><label class="field"><span>规则 ID</span><input id="account-rule" maxlength="80" placeholder="规则 ID"></label><label class="field"><span>机器人 ID</span><input id="account-robot" maxlength="160" placeholder="可暂留空"></label><button class="button button-secondary" id="save-source-account" type="button">保存为暂停配置</button></div><div class="security-note">真实多账号登录、游标和断线重放尚未启用。</div></section>
+        </div>
+      </section>
+
+      <section class="view" id="view-suggestion-audit">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">客户对话整理 <span class="eyebrow-line"></span> FAQ 与真实回复自动对照</div><h1>真实回复校验 FAQ</h1><p class="subhead">已明确关联的群回复直接作为正确答案。系统逐条判断命中的 FAQ 是能回答、相关但不完整、冲突还是无关；不再让你重复审核有真实答案的案例。</p></div><div class="intro-right"><span class="dev-only-tag">本机整理 · 不发送消息</span><button class="button button-secondary" id="rebuild-case-suggestions" type="button">整理全部现有对话</button></div></div>
+        <div class="dev-audit-notice suggestion-purpose-notice"><strong>本轮整理口径</strong><ol><li>明确关联到客户的真实回复就是标准答案，附近群消息只作背景。</li><li>系统根据客户问题、真实回复和已启用 FAQ 自动给每条 FAQ 下结论；候选文字分数不会代替正确性判断。</li><li>有复用价值且问答关系明确的内容自动整理到“FAQ 沉淀”，按“当前产品 / 通用”归档，等待确认后才会启用。</li><li>只有真实回复缺失或证据确实不足的案例才留在“待人工核对”。</li></ol><p>分类问题仍在“分类审核”中处理。本轮只写本机工作台，不调用 DeepSeek、不发送消息、不回写云中客或飞书。</p></div><div class="workflow-note" id="workflow-job-status" hidden></div>
+        <div class="inbox-layout dev-audit-layout suggestion-audit-layout"><section class="panel queue-panel"><div class="panel-heading queue-heading"><div><h2>对话处理结果</h2><span class="panel-caption" id="suggestion-count">未生成</span></div></div><div class="dev-audit-status-tabs"><button data-suggestion-status="todo" aria-pressed="true" type="button">待人工核对</button><button data-suggestion-status="reviewed" aria-pressed="false" type="button">系统已整理</button><button data-suggestion-status="all" aria-pressed="false" type="button">全部</button></div><div class="queue-list" id="suggestion-list"><div class="work-item-load-state">整理后，真实回复明确的对话会自动完成 FAQ 对照；只有无法判断的内容留待人工核对。</div></div><div class="queue-footer"><span id="suggestion-page-count">—</span><button id="load-more-suggestions" class="text-button" type="button" hidden>继续加载 <span>→</span></button></div></section><section class="panel detail-panel" id="suggestion-detail"><div class="detail-placeholder"><div><div class="empty-symbol">✓</div><strong>选择一段客户对话</strong><span>真实回复会直接用于 FAQ 对照；仅展示需要你判断的例外。</span></div></section></div>
+      </section>
+
+      <section class="view" id="view-dev-audit">
+        <div class="page-intro compact-intro"><div><div class="eyebrow">DEVELOPMENT CALIBRATION <span class="eyebrow-line"></span> RULE <span id="dev-audit-version">—</span></div><h1>分类审核</h1><p class="subhead">逐条确认机器分类是否符合业务含义，并可补充同时适用的标签。审核结果只用于开发校准，不改变日常审核或消息处理状态。</p></div><div class="intro-right"><span class="dev-only-tag">开发审核 · 本机保存</span><button class="button button-secondary" id="dev-audit-refresh" type="button">刷新列表</button></div></div>
+        <div class="dev-audit-metrics">
+          <article class="metric-card"><div class="metric-top"><span>可审核消息</span></div><div class="metric-number" id="dev-audit-total">—</div><div class="metric-foot"><span class="metric-muted">当前规则版本</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span>已完成人工标注</span></div><div class="metric-number" id="dev-audit-reviewed">—</div><div class="metric-foot"><span class="metric-muted">待审核 <b id="dev-audit-todo">—</b> 条</span></div></article>
+          <article class="metric-card"><div class="metric-top"><span>分类一致率</span></div><div class="metric-number" id="dev-audit-accuracy">—</div><div class="metric-foot"><span class="metric-muted">人工主类与机器主类相同</span></div></article>
+        </div>
+        <div class="dev-audit-notice"><strong>审核步骤</strong><span>分类正确：直接点“分类正确，保存并审核下一条”；分类不正确：修改分类并填写原因后提交。已审核样本可回看修改。</span></div>
+        <div class="inbox-layout dev-audit-layout">
+          <section class="panel queue-panel dev-audit-queue">
+            <div class="panel-heading queue-heading"><div><h2>消息样本</h2><span class="panel-caption" id="dev-audit-list-count">正在读取</span></div></div>
+            <div class="dev-audit-status-tabs" aria-label="审核状态">
+              <button type="button" data-dev-audit-status="todo" aria-pressed="true">未审核 <span id="dev-audit-tab-todo">—</span></button>
+              <button type="button" data-dev-audit-status="audited" aria-pressed="false">已审核 <span id="dev-audit-tab-audited">—</span></button>
+              <button type="button" data-dev-audit-status="all" aria-pressed="false">全部样本</button>
+            </div>
+            <select id="dev-audit-status" hidden aria-label="审核状态"><option value="todo">未审核</option><option value="audited">已审核</option><option value="all">全部</option></select>
+            <div class="dev-audit-filters">
+              <label class="field"><span>机器分类</span><select id="dev-audit-kind"><option value="">全部分类</option></select></label>
+              <label class="search-box"><span class="search-icon">⌕</span><input id="dev-audit-search" type="search" placeholder="搜索消息、群或成员"></label>
+              <label class="dev-audit-difference-filter"><input id="dev-audit-differences" type="checkbox">只看当前规则与人工结论不同的样本</label>
+            </div>
+            <div class="queue-list" id="dev-audit-list" aria-live="polite"></div>
+            <div class="queue-footer"><span id="dev-audit-page-state">每次加载 50 条</span><button id="dev-audit-load-more" class="text-button" type="button">查看较早消息 <span>→</span></button></div>
+          </section>
+          <section class="panel detail-panel dev-audit-detail" id="dev-audit-detail"><div class="detail-placeholder"><div><div class="empty-symbol">⌕</div><strong>选择一条消息开始审核</strong><span>右侧会展示消息、机器分类依据和同一客户上下文。</span></div></div></section>
+        </div>
+        <details class="panel dev-audit-report-panel"><summary>查看已审核样本统计</summary><div class="dev-audit-report" id="dev-audit-report">完成人工审核后显示逐标签指标和分类混淆。</div></details>
+      </section>
+
+  <footer class="app-footer"><span>群消息工作台 <b>·</b> <span id="footer-rule-id">规则号读取配置中</span> · 本机服务</span><span><i class="footer-dot"></i>无群消息发送 <b>·</b> 飞书入库需单独执行</span></footer>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <dialog class="edit-dialog" id="faq-dialog"><form method="dialog" id="faq-form"><div class="dialog-head"><div><span class="eyebrow">FAQ 编辑</span><h2 id="faq-dialog-title">编辑 FAQ</h2></div><button class="dialog-close" value="cancel" aria-label="关闭">×</button></div><label class="field"><span>所属分组</span><select id="faq-edit-group"></select></label><div class="form-grid"><label class="field"><span>适用类型</span><select id="faq-edit-scope"><option value="general">通用长期 FAQ</option><option value="product">产品与日期限定 FAQ</option></select></label><label class="field"><span>商品名称（产品 FAQ 填写）</span><input id="faq-edit-product"></label><label class="field"><span>开始日期</span><input id="faq-edit-from" type="date"></label><label class="field"><span>截止日期</span><input id="faq-edit-until" type="date"></label><label class="field full-field"><span>适用群（* 为全部群，否则填写群 ID）</span><input id="faq-edit-groups" value="*"></label></div><label class="field"><span>问题 / 关键词</span><input id="faq-edit-question" required></label><label class="field"><span>建议答案</span><textarea id="faq-edit-answer" rows="5" required></textarea></label><label class="field"><span>匹配关键词（逗号分隔）</span><input id="faq-edit-keywords"></label><div class="dialog-actions"><button class="button button-quiet" value="cancel">取消</button><button class="button button-primary" id="faq-save" value="default">保存本地 FAQ</button></div></form></dialog>
+  <dialog class="edit-dialog" id="faq-import-dialog"><div class="dialog-head"><div><span class="eyebrow">来源只读快照</span><h2>导入快捷回复快照</h2></div><button class="dialog-close" id="faq-import-close" type="button" aria-label="关闭">×</button></div><p>粘贴从云中客只读提取的 JSON 条目。新增文字回复会先处于待审核状态；来源变化不会覆盖本地修改。</p><label class="field"><span>来源条目 JSON</span><textarea id="faq-import-data" rows="8" placeholder='[{"group":"分组","n":"#1","title":"问题","answer":"答案"}]'></textarea></label><div class="dialog-actions"><button class="button button-primary" id="faq-import-submit" type="button">导入快照</button></div></dialog>
+  <dialog class="edit-dialog" id="faq-candidate-dialog"><form method="dialog" id="faq-candidate-form"><div class="dialog-head"><div><span class="eyebrow">真实回复候选</span><h2 id="faq-candidate-dialog-title">整理 FAQ 候选</h2></div><button class="dialog-close" value="cancel" aria-label="关闭">×</button></div><label class="field"><span>候选范围</span><select id="faq-candidate-scope"><option value="general">通用 FAQ</option><option value="product">当前产品 FAQ</option></select></label><label class="field" id="faq-candidate-product-field"><span>商品名称</span><input id="faq-candidate-product" placeholder="填写该回复对应的商品"></label><div class="form-grid" id="faq-candidate-dates"><label class="field"><span>生效日期</span><input id="faq-candidate-valid-from" type="date"></label><label class="field"><span>失效日期（加入可用 FAQ 前必填）</span><input id="faq-candidate-valid-until" type="date"></label></div><label class="field"><span>适用群（* 为全部群，否则填群 ID）</span><input id="faq-candidate-groups"></label><label class="field"><span>常见问题</span><textarea id="faq-candidate-question" rows="3" required></textarea></label><label class="field"><span>标准答案（来自真实回复，可编辑）</span><textarea id="faq-candidate-answer" rows="4" required></textarea></label><label class="field"><span>匹配关键词</span><input id="faq-candidate-keywords" placeholder="多个关键词用逗号分隔"></label><div class="dialog-actions"><button class="button button-quiet" value="cancel">取消</button><button class="button button-primary" id="faq-candidate-save" value="default">保存为待确认候选</button></div></form></dialog>
+  <dialog id="image-preview-dialog" class="image-preview-dialog" aria-label="图片大图预览">
+    <div class="image-preview-shell">
+      <button id="image-preview-close" class="image-preview-close" type="button" aria-label="关闭图片预览">×</button>
+      <img id="image-preview-image" alt="原图大图预览">
+      <span>点击外侧或按 Esc 关闭</span>
+    </div>
+  </dialog>
+  <script src="exports.js?v=20261028-miaoda-phash-v1"></script>
+  <script src="processing-core.js?v=20261102-service-source"></script>
+  <script src="app.js?v=20261102-aftercare-evidence"></script>
+</body>
+</html>
